@@ -13,7 +13,7 @@ public class ComboManager : MonoBehaviour
         "LR", // Left punch followed by right punch.
         "LLL", // Three left punches in a row.
         "RR",  // Right punch followed by right punch.
-        "LLRL" // Left, left, right, left.
+        "LRLR" // Left, right, left, right
     };
 
     private int currentComboIndex = 0;
@@ -26,11 +26,13 @@ public class ComboManager : MonoBehaviour
     private float observableDelay = 0.3f; // Delay before activating observable state.
     public GameObject playerPosition;
 
+    public GameObject robot;
+
     void Start()
     {
         if (combos.Count > 0)
         {
-            UpdateComboText("First combo: " + combos[0]);
+            UpdateComboText("Perform Combo: " + combos[0]);
         }
 
         StartCoroutine(ObserveState());
@@ -47,6 +49,10 @@ public class ComboManager : MonoBehaviour
         leftHand.SetActive(false);
         rightHand.SetActive(false);
 
+        // Play the animation for the current combo.
+        string animationName = GetComboAnimationName(currentComboIndex + 1);
+        robot.GetComponent<Animator>().Play(animationName);
+
         Vector3 originalPosition = playerPosition.transform.position;
         playerPosition.transform.position = new Vector3(originalPosition.x, originalPosition.y, originalPosition.z + 2.0f);
 
@@ -58,7 +64,12 @@ public class ComboManager : MonoBehaviour
 
         isObservable = false;
         playerPosition.transform.position = originalPosition;
-        comboText.text = "Start performing combos!";
+        UpdateComboText("Perform Combo: " + combos[currentComboIndex]);
+    }
+
+    string GetComboAnimationName(int comboNumber)
+    {
+        return "Combo" + comboNumber.ToString();
     }
 
     void Update()
@@ -95,11 +106,12 @@ public class ComboManager : MonoBehaviour
 
                 if (currentComboIndex < combos.Count)
                 {
-                    UpdateComboText("Next combo: " + combos[currentComboIndex]);
+                    UpdateComboText("Perform Combo: " + combos[currentComboIndex]);
                 }
                 else
                 {
-                    currentComboIndex = 0;
+                    // All combos executed, end training session.
+                    StartCoroutine(EndTrainingSession());
                 }
 
                 currentInput = "";
@@ -113,6 +125,16 @@ public class ComboManager : MonoBehaviour
                 currentInput = "";
             }
         }
+    }
+
+    IEnumerator EndTrainingSession()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        // Display end message.
+        UpdateComboText("Training session done");
+
+        // Block mechanics or perform any other end-of-session actions.
     }
 
     void UpdateComboText(string text)
