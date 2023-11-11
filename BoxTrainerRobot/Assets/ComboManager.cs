@@ -54,7 +54,7 @@ public class ComboManager : MonoBehaviour
         robot.GetComponent<Animator>().Play(animationName);
 
         Vector3 originalPosition = playerPosition.transform.position;
-        playerPosition.transform.position = new Vector3(originalPosition.x, originalPosition.y, originalPosition.z + 2.0f);
+        playerPosition.transform.position = new Vector3(originalPosition.x, originalPosition.y, originalPosition.z + 1.0f);
 
         yield return new WaitForSeconds(observableDuration);
 
@@ -133,6 +133,9 @@ public class ComboManager : MonoBehaviour
 
         // Display end message.
         UpdateComboText("Training session done");
+
+        // Play the 5th animation.
+        robot.GetComponent<Animator>().Play("Combo5");
 
         // Block mechanics or perform any other end-of-session actions.
     }
